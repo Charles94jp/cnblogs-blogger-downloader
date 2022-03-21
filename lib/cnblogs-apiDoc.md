@@ -15,9 +15,9 @@
 
 ## 1 获取用户随笔分类列表
 
-**请求方式：**GET
+**请求方式：** GET
 
-**请求地址：**https://i.cnblogs.com/api/category/blog/1/edit
+**请求地址：** https://i.cnblogs.com/api/category/blog/1/edit
 
 **参数列表：**
 
@@ -25,7 +25,7 @@
 | ------ | ---- | ---- | ---- | ---- |
 | /      |      |      |      |      |
 
-**详细说明：**根据用户Cookie获取用户的随笔分类的列表
+**详细说明：** 根据用户Cookie获取用户的随笔分类的列表
 
 **请求示例：**
 
@@ -53,9 +53,9 @@ https://i.cnblogs.com/api/category/blog/1/edit
 
 ## 2 获取用户随笔列表
 
-**请求方式：**GET
+**请求方式：** GET
 
-**请求地址：**https://i.cnblogs.com/api/posts/list
+**请求地址：** https://i.cnblogs.com/api/posts/list
 
 **参数列表：**
 
@@ -115,7 +115,7 @@ https://i.cnblogs.com/api/posts/list?p=1&cid=&tid=&t=1&cfg=0&search=&orderBy=&sc
 
 ## 3 获取随笔内容
 
-**请求方式：**GET
+**请求方式：** GET
 
 **请求地址：**[https://i.cnblogs.com/api/posts/{id}](https://i.cnblogs.com/api/posts/{id})
 

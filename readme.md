@@ -6,9 +6,32 @@
 
 本程序意在让各位博客园上写作的作者拿回属于自己的文章。程序会以博客园的随笔分类来建立文件夹并下载响应的文章，文章格式为md格式
 
-使用时先浏览器登录博客园，登录时勾选"记住我"
+# Usage
 
-登录后浏览器按F12，找到Cookie，拷贝`.Cnblogs.AspNetCore.Cookies`的值到`main.py`的`COOKIE`中，运行`main.py`即可
+## Configuration
+
+运行前需要进行配置：
+
+1. 打开浏览器登录博客园，登录时勾选"记住我"
+
+2. 登录后浏览器按F12，找到Cookie，拷贝`.Cnblogs.AspNetCore.Cookies`的值到`main.py`的`COOKIE`中
+
+3. `main.py`中`dl.CnblogsDownloader`的第二个参数为下载路径
+
+可选的配置：
+
+**将随笔中引用的图片一并离线到随笔的文件夹**，需要更改`main.py`
+
+```python
+# 将此行
+downloader = dl.CnblogsDownloader(COOKIE, "D:\cnblogs")
+# 改为
+downloader = dl.CnblogsDownloader(COOKIE, "D:\cnblogs", download_img=True)
+```
+
+md中的链接会自动替换
+
+## Features
 
 下载的文件名为随笔标题，分类和标题中的特殊字符`\/:*?"<>|`会被空格代替，文件编码为UTF-8
 
@@ -16,7 +39,7 @@
 
 程序只能在Windows下运行，未做其他系统适配
 
-图片暂不支持下载
+# For Developer
 
 博客园公开的api文档：https://api.cnblogs.com/help
 
