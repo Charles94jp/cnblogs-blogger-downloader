@@ -57,15 +57,14 @@ class CnblogsDownloader:
     def __download_replace_img(essay_title, essay_content):
         img_url = []
         # 替换所有![]() <img src="">的图片地址为![](./xx)，同时把被替换的图片url放在img_url中
-        # bug: append到img_url中的是set，不是str，set不可hash，没法给img_url去重
         essay_content = re.sub(r'!\[[^\]]*?\]\(([^\)]*/([^\)]*?))\)|<img[^>]*?src="([^"]*/([^"]*?))"[^>]*?>',
-                               lambda m: img_url.append({m.group(1) if m.group(1) else m.group(3)}) or
+                               lambda m: img_url.append(m.group(1) if m.group(1) else m.group(3)) or
                                          rf'![](./{m.group(2) if m.group(2) else m.group(4)})',
                                essay_content)
+        img_url = set(img_url)
         http_headers = {"Referer": "https://i.cnblogs.com/"}
         for url in img_url:
             # 不再校验文件名的合法性
-            url = url.pop()
             try:
                 r = httpx.get(url, headers=http_headers, timeout=api.TIMEOUT)
                 img_name = url.split('/')[-1]
@@ -74,6 +73,4 @@ class CnblogsDownloader:
                 print(rf'已下载图片：{img_name}')
             except Exception as e:
                 print(f'error: 为《{essay_title}》下载图片失败，链接：{url}')
-            finally:
-                del r
         return essay_content
