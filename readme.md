@@ -39,6 +39,12 @@ md中的链接会自动替换
 
 程序只能在Windows下运行，未做其他系统适配
 
+如果你在博客园中删除了一篇文章，程序不会删除相应的本地文章
+
+`.CnblogsDownloaderFlag.json`中保存着上次运行程序的时间，如果博客园中的文章未更新，那么不会反复下载
+
+一旦程序决定要下载某篇随笔，那么它会覆盖此随笔及其引用的图片
+
 # For Developer
 
 博客园公开的api文档：https://api.cnblogs.com/help

@@ -1,5 +1,7 @@
+import json
 import os
 import re
+from datetime import datetime, timedelta
 
 import httpx
 
@@ -11,6 +13,11 @@ class CnblogsDownloader:
     __category = {}
     __workdir = ""
     __download_img = False
+    __total_essay = 0
+    __updated_essay = 0
+    __is_first_run = True
+    __last_update = None
+    __FLAG_FILE_NAME = ".CnblogsDownloaderFlag.json"
 
     def __init__(self, cnblogs_cookie, workdir, download_img=False):
         self.__http_headers = {
@@ -21,6 +28,16 @@ class CnblogsDownloader:
         self.__category = api.get_category_list(self.__http_headers)
         self.__workdir = workdir
         self.__download_img = download_img
+        flag_path = rf"{workdir}\{self.__FLAG_FILE_NAME}"
+        if os.path.isfile(flag_path):
+            self.__is_first_run = False
+            flag = None
+            with open(flag_path, "r", encoding="utf-8") as f:
+                flag = json.load(f)
+                pass
+            # download_to_subdir最后还有写入操作
+            last_update = flag["last_update"]
+            self.__last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%S")
 
     def download_to_subdir(self):
         current_path = os.getcwd()
@@ -28,29 +45,42 @@ class CnblogsDownloader:
         self.__category.append({"categoryId": 0, "title": "未分类"})
         for category in self.__category:
             dirname = category["title"]
-            dirname = re.sub(rf'(\\|/|\?|\||"|:|\*|<|>)', ' ', dirname)
+            dirname = re.sub(rf'(\\|/|\?|\||"|:|\*|<|>)', " ", dirname)
             if not os.path.isdir(dirname):
                 os.mkdir(dirname)
             os.chdir(rf"{self.__workdir}\{dirname}")
 
             essays = api.get_posts_list(self.__http_headers, category_id=str(category["categoryId"]))
+            self.__total_essay = self.__total_essay + essays["postsCount"]
             for essay_pre in essays["postList"]:
-                essay = api.get_post_by_id(self.__http_headers, str(essay_pre["id"]))
-                filename = essay["blogPost"]["title"]
+
+                filename = essay_pre["title"]
                 # 替换特殊字符，Windows文件名不允许出现特殊字符： \/:*?"<>|
-                filename = re.sub(rf'(\\|/|\?|\||"|:|\*|<|>)', ' ', filename)
-                filename = rf'{filename}{"[非公开]" if not essay["blogPost"]["isPublished"] else ""}' \
-                           rf'{"[草稿]" if essay["blogPost"]["isDraft"] else ""}.md'
+                filename = re.sub(rf'(\\|/|\?|\||"|:|\*|<|>)', " ", filename)
+                filename = rf'{filename}{"[非公开]" if not essay_pre["isPublished"] else ""}' \
+                           rf'{"[草稿]" if essay_pre["isDraft"] else ""}.md'
+
+                essay_date_updated = datetime.strptime(essay_pre["dateUpdated"], "%Y-%m-%dT%H:%M:%S")
+                if (not self.__is_first_run) and os.path.isfile(filename) and \
+                        (self.__last_update - essay_date_updated).total_seconds() > 0:
+                    print(rf"已是最新：{dirname}\{filename}")
+                    continue
+                essay = api.get_post_by_id(self.__http_headers, str(essay_pre["id"]))
 
                 essay_content = essay["blogPost"]["postBody"]
                 if self.__download_img:
                     essay_content = CnblogsDownloader.__download_replace_img(filename, essay_content)
 
-                with open(filename, "w", encoding='utf-8') as f:
+                with open(filename, "w", encoding="utf-8") as f:
                     f.write(essay_content)
-                print(rf'已下载文章：{dirname}\{filename}')
+                self.__updated_essay = self.__updated_essay + 1
+                print(rf"已下载文章：{dirname}\{filename}")
 
             os.chdir(self.__workdir)
+        print(rf"总共{self.__total_essay}篇随笔，更新了{self.__updated_essay}篇")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        with open(rf"{self.__workdir}\{self.__FLAG_FILE_NAME}", "w", encoding="utf-8") as f:
+            f.write(rf'{{"last_update": "{now}"}}')
         os.chdir(current_path)
 
     @staticmethod
@@ -59,7 +89,7 @@ class CnblogsDownloader:
         # 替换所有![]() <img src="">的图片地址为![](./xx)，同时把被替换的图片url放在img_url中
         essay_content = re.sub(r'!\[[^\]]*?\]\(([^\)]*/([^\)]*?))\)|<img[^>]*?src="([^"]*/([^"]*?))"[^>]*?>',
                                lambda m: img_url.append(m.group(1) if m.group(1) else m.group(3)) or
-                                         rf'![](./{m.group(2) if m.group(2) else m.group(4)})',
+                                         rf"![](./{m.group(2) if m.group(2) else m.group(4)})",
                                essay_content)
         img_url = set(img_url)
         http_headers = {"Referer": "https://i.cnblogs.com/"}
@@ -67,10 +97,10 @@ class CnblogsDownloader:
             # 不再校验文件名的合法性
             try:
                 r = httpx.get(url, headers=http_headers, timeout=api.TIMEOUT)
-                img_name = url.split('/')[-1]
-                with open(img_name, 'wb') as f:
+                img_name = url.split("/")[-1]
+                with open(img_name, "wb") as f:
                     f.write(r.content)
-                print(rf'已下载图片：{img_name}')
+                print(rf"已下载图片：{img_name}")
             except Exception as e:
-                print(f'error: 为《{essay_title}》下载图片失败，链接：{url}')
+                print(f"error: 为《{essay_title}》下载图片失败，链接：{url}")
         return essay_content
