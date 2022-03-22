@@ -74,7 +74,7 @@ class CnblogsDownloader:
                 with open(filename, "w", encoding="utf-8") as f:
                     f.write(essay_content)
                 self.__updated_essay = self.__updated_essay + 1
-                print(rf"已下载文章：{dirname}\{filename}")
+                print(rf"已下载随笔：{dirname}\{filename}")
 
             os.chdir(self.__workdir)
         print(rf"总共{self.__total_essay}篇随笔，更新了{self.__updated_essay}篇")
@@ -86,18 +86,25 @@ class CnblogsDownloader:
     @staticmethod
     def __download_replace_img(essay_title, essay_content):
         img_url = []
-        # 替换所有![]() <img src="">的图片地址为![](./xx)，同时把被替换的图片url放在img_url中
-        essay_content = re.sub(r'!\[[^\]]*?\]\(([^\)]*/([^\)]*?))\)|<img[^>]*?src="([^"]*/([^"]*?))"[^>]*?>',
-                               lambda m: img_url.append(m.group(1) if m.group(1) else m.group(3)) or
-                                         rf"![](./{m.group(2) if m.group(2) else m.group(4)})",
-                               essay_content)
+
+        # bug：写成lambda表达式用or连接两句时，只会执行最后一个表达式，猜测是因为前面的语句没有返回值
+        def replace(m):
+            img_url.append(m.group(2) if m.group(2) else m.group(6))
+            return rf"{m.group(1)}{m.group(3)}{m.group(4)}" if m.group(3) else rf"{m.group(5)}{m.group(7)}{m.group(8)}"
+
+        # 正则中使用(?:)非捕获元无效
+        essay_content = re.sub(r'(!\[[^\]]*?\]\()([^\)]*/([^\)]*?))(\))|(<img[^>]*?src=")([^"]*/([^"]*?))("[^>]*?>)',
+                               replace, essay_content)
         img_url = set(img_url)
         http_headers = {"Referer": "https://i.cnblogs.com/"}
         for url in img_url:
             # 不再校验文件名的合法性
+            img_name = url.split("/")[-1]
+            if os.path.isfile(img_name):
+                print(rf"图片已存在：{img_name}")
+                continue
             try:
                 r = httpx.get(url, headers=http_headers, timeout=api.TIMEOUT)
-                img_name = url.split("/")[-1]
                 with open(img_name, "wb") as f:
                     f.write(r.content)
                 print(rf"已下载图片：{img_name}")
