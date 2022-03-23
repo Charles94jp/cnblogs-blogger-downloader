@@ -1,10 +1,18 @@
 <h1 align="center">
-   Cnblogs Blogger Downloader
-  <br>
+  <a href="#">
+  <img src="./img/logo.png" width ="530px">
+  </a>
   <br>
 </h1>
 
-本程序意在让各位博客园上写作的作者拿回属于自己的文章。程序会以博客园的随笔分类来建立文件夹并下载响应的文章，文章格式为md格式
+<p align="center">
+<a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.zh-cn.html"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg"></a>  
+<a href="#python3"><img src="https://img.shields.io/badge/python-v3.8-blue"></a>
+<a href="https://www.python-httpx.org/"><img src="https://img.shields.io/badge/httpx-v0.22.0-brightgreen"></a>
+</p>
+本程序意在让各位博客园作者拿回属于自己的文章。程序会以博客园的随笔分类来建立文件夹并下载相应的文章，文章格式为md格式
+
+
 
 # Usage
 
@@ -31,6 +39,30 @@ downloader = dl.CnblogsDownloader(COOKIE, "D:\cnblogs", download_img=True)
 
 md中的链接会自动替换
 
+
+
+## Dependencies
+
+```
+pip install httpx
+```
+
+
+
+## Start
+
+配置好程序并安装好httpx依赖后，命令行运行：
+
+```python
+python main.py
+```
+
+会看到打印的输出:
+
+![example](./img/example.png)
+
+
+
 ## Features
 
 下载的文件名为随笔标题，分类和标题中的特殊字符`\/:*?"<>|`会被空格代替，文件编码为UTF-8
@@ -44,6 +76,8 @@ md中的链接会自动替换
 `.CnblogsDownloaderFlag.json`中保存着上次运行程序的时间，如果博客园中的文章未更新，那么不会反复下载
 
 一旦程序决定要下载某篇随笔，那么它会覆盖此随笔及其引用的图片
+
+
 
 # For Developer
 
