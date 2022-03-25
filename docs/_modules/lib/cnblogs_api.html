@@ -81,7 +81,7 @@
 
 <span class="sd">    :param dict http_header: 其中应当包含Cookie</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc &lt;/lib/cnblogs-apiDoc.html&gt;`_</span>
+<span class="sd">    :return: 详情参见接口文档: `cnblogs-apiDoc.md &lt;./cnblogs-apiDoc.html&gt;`_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://i.cnblogs.com/api/category/blog/1/edit&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">http_header</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
@@ -94,7 +94,7 @@
 <span class="sd">    :param dict http_header: 其中应当包含Cookie</span>
 <span class="sd">    :param int category_id: get_category_list结果中分类对应的id，不设置时查询所有随笔</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc &lt;/lib/cnblogs-apiDoc.html&gt;`_</span>
+<span class="sd">    :return: 详情参见接口文档: `cnblogs-apiDoc.md &lt;./cnblogs-apiDoc.html&gt;`_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;https://i.cnblogs.com/api/posts/list?p=1&amp;cid=</span><span class="si">{</span><span class="n">category_id</span><span class="si">}</span><span class="s2">&amp;tid=&amp;t=1&amp;cfg=0&amp;search=&amp;orderBy=&amp;scid=&quot;</span><span class="p">,</span>
                   <span class="n">headers</span><span class="o">=</span><span class="n">http_header</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
@@ -120,7 +120,7 @@
 <span class="sd">    :param dict http_header: 其中应当包含Cookie</span>
 <span class="sd">    :param int id: 从`get_posts_list`结果中随笔对应的id</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc &lt;/lib/cnblogs-apiDoc.html&gt;`_</span>
+<span class="sd">    :return: 详情参见接口文档: `cnblogs-apiDoc.md &lt;./cnblogs-apiDoc.html&gt;`_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;https://i.cnblogs.com/api/posts/</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">http_header</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>

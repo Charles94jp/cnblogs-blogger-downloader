@@ -87,4 +87,19 @@ python main.py
 
 但显然不够用，而且要申请api权限，于是自己根据网络通信总结了几个重要的api的文档：[cnblogs-apiDoc](/lib/cnblogs-apiDoc.md)
 
+
+
+本项目API文档：[Document](https://charles94jp.github.io/cnblogs-blogger-downloader)
+
+根据代码文档注释构建API文档：
+
+```
+pip install sphinx sphinx-rtd-theme
+sphinx-build.exe -b html .\sphinx\source\ docs
+```
+
+注意`docs/lib/cnblogs-apiDoc.html`和`typora.css`是手动添加进去的
+
+
+
 本项目的开源协议为：[GPL-3.0 License](/LICENSE)

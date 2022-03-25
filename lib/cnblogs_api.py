@@ -13,7 +13,7 @@ def get_category_list(http_header):
 
     :param dict http_header: 其中应当包含Cookie
     :rtype: dict
-    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc </lib/cnblogs-apiDoc.html>`_
+    :return: 详情参见接口文档: `cnblogs-apiDoc.md <./cnblogs-apiDoc.html>`_
     """
     r = httpx.get("https://i.cnblogs.com/api/category/blog/1/edit", headers=http_header, timeout=TIMEOUT)
     return r.json()
@@ -26,7 +26,7 @@ def get_posts_list(http_header, category_id=""):
     :param dict http_header: 其中应当包含Cookie
     :param int category_id: get_category_list结果中分类对应的id，不设置时查询所有随笔
     :rtype: dict
-    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc </lib/cnblogs-apiDoc.html>`_
+    :return: 详情参见接口文档: `cnblogs-apiDoc.md <./cnblogs-apiDoc.html>`_
     """
     r = httpx.get(rf"https://i.cnblogs.com/api/posts/list?p=1&cid={category_id}&tid=&t=1&cfg=0&search=&orderBy=&scid=",
                   headers=http_header, timeout=TIMEOUT)
@@ -52,7 +52,7 @@ def get_post_by_id(http_header, id):
     :param dict http_header: 其中应当包含Cookie
     :param int id: 从`get_posts_list`结果中随笔对应的id
     :rtype: dict
-    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc </lib/cnblogs-apiDoc.html>`_
+    :return: 详情参见接口文档: `cnblogs-apiDoc.md <./cnblogs-apiDoc.html>`_
     """
     r = httpx.get(rf"https://i.cnblogs.com/api/posts/{id}", headers=http_header, timeout=TIMEOUT)
     return r.json()
