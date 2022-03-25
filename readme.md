@@ -10,34 +10,24 @@
 <a href="#python3"><img src="https://img.shields.io/badge/python-v3.8-blue"></a>
 <a href="https://www.python-httpx.org/"><img src="https://img.shields.io/badge/httpx-v0.22.0-brightgreen"></a>
 </p>
-本程序意在让各位博客园作者拿回属于自己的文章。程序会以博客园的随笔分类来建立文件夹并下载相应的文章，文章格式为md格式
+本程序意在让博客园作者拿回属于自己的数据。程序会以博客园的随笔分类来建立文件夹并下载相应的随笔原稿件，文章格式为md格式，同时支持离线文章中引用的图片
 
+博客园官方有[备份功能](https://www.cnblogs.com/super925/p/8093453.html)，但是下载的文件是一个xml，不易于阅读及分离文章
 
 
 # Usage
 
 ## Configuration
 
-运行前需要进行配置：
+运行前需要配置`config.ini`：
 
-1. 打开浏览器登录博客园，登录时勾选"记住我"
+1. 修改`config.ini.example`文件名为`config.ini`
+2. 打开浏览器登录博客园，登录时勾选"记住我"
+3. 登录后浏览器按F12，找到Cookie，拷贝`.Cnblogs.AspNetCore.Cookies`的值到`config.ini`中
+4. 其余选项按需填写，文件需以UTF-8编码保存
 
-2. 登录后浏览器按F12，找到Cookie，拷贝`.Cnblogs.AspNetCore.Cookies`的值到`main.py`的`COOKIE`中
+开启离线后，随笔中的图片链接会被替换自动为本地图片的链接
 
-3. `main.py`中`dl.CnblogsDownloader`的第二个参数为下载路径
-
-可选的配置：
-
-**将随笔中引用的图片一并离线到随笔的文件夹**，需要更改`main.py`
-
-```python
-# 将此行
-downloader = dl.CnblogsDownloader(COOKIE, "D:\cnblogs")
-# 改为
-downloader = dl.CnblogsDownloader(COOKIE, "D:\cnblogs", download_img=True)
-```
-
-md中的链接会自动替换
 
 
 
@@ -61,6 +51,8 @@ python main.py
 
 ![example](./img/example.png)
 
+平时科学上网的话运行时需关闭全局代理，否则http连接错误
+
 
 
 ## Features
@@ -76,6 +68,16 @@ python main.py
 `.CnblogsDownloaderFlag.json`中保存着上次运行程序的时间，如果博客园中的文章未更新，那么不会反复下载
 
 一旦程序决定要下载某篇随笔，那么它会覆盖此随笔及其引用的图片
+
+代码块中的图片也会被下载，只要它的链接是有效的，比如你的随笔中有下列内容
+
+````markdown
+假如这是你的随笔原稿
+```
+<img src="https://github.com/Charles94jp/cnblogs-blogger-downloader/blob/master/img/logo.png?raw=true">
+```
+那么上面代码块里的图片也会被下载
+````
 
 
 
