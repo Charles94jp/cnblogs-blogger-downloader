@@ -112,7 +112,7 @@ pip install sphinx sphinx-rtd-theme
 sphinx-build.exe -b html .\sphinx\source\ docs
 ```
 
-注意`docs/lib/cnblogs-apiDoc.html` `typora.css`和ico是手动添加进去的
+注意`docs/lib/cnblogs-apiDoc.html` `typora.css`和`docs/.nojekyll`是手动添加进去的
 
 
 
