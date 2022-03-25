@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cnblogs_downloader &mdash; Cnblogs Blogger Downloader  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Cnblogs Blogger Downloader
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../main.html">main module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cnblogs_downloader.html">cnblogs_downloader module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lib/modules.html">lib</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Cnblogs Blogger Downloader</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>cnblogs_downloader</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cnblogs_downloader</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">httpx</span>
+
+<span class="kn">import</span> <span class="nn">lib.cnblogs_api</span> <span class="k">as</span> <span class="nn">api</span>
+
+
+<div class="viewcode-block" id="CnblogsDownloader"><a class="viewcode-back" href="../cnblogs_downloader.html#cnblogs_downloader.CnblogsDownloader">[docs]</a><span class="k">class</span> <span class="nc">CnblogsDownloader</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    下载器类，日志均print到控制台\n</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_FLAG_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;.CnblogsDownloaderFlag.json&quot;</span>
+
+    <span class="n">_IMG_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(!\[[^\]]*?\]\()([^\)]*/([^\)]*?))(\))|(&lt;img[^&gt;]*?src=&quot;)([^&quot;]*/([^&quot;]*?))(&quot;[^&gt;]*?&gt;)&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    预先编译正则</span>
+<span class="sd">    called by :py:func:`CnblogsDownloader._download_replace_img`\n</span>
+<span class="sd">    此处正则中使用(?:)非捕获元无效</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CnblogsDownloader.__init__"><a class="viewcode-back" href="../cnblogs_downloader.html#cnblogs_downloader.CnblogsDownloader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cnblogs_cookie</span><span class="p">,</span> <span class="n">workdir</span><span class="p">,</span> <span class="n">download_img</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        初始化下载器类</span>
+
+<span class="sd">        :param str cnblogs_cookie: 博客园Cookie .Cnblogs.AspNetCore.Cookies的值</span>
+<span class="sd">        :param str workdir: 工作目录，即下载目录</span>
+<span class="sd">        :param bool download_img: 是否离线随笔中引用的图片</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_essay</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updated_essay</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_first_run</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_update</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workdir</span> <span class="o">=</span> <span class="n">workdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_download_img</span> <span class="o">=</span> <span class="n">download_img</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_http_headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) &quot;</span>
+                          <span class="s2">&quot;Chrome/99.0.4844.74 Safari/537.36&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Referer&quot;</span><span class="p">:</span> <span class="s2">&quot;https://i.cnblogs.com/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Cookie&quot;</span><span class="p">:</span> <span class="sa">rf</span><span class="s2">&quot;.Cnblogs.AspNetCore.Cookies=</span><span class="si">{</span><span class="n">cnblogs_cookie</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_category_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_http_headers</span><span class="p">)</span>
+
+        <span class="n">flag_path</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">workdir</span><span class="si">}</span><span class="s2">\</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_FLAG_FILE_NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">flag_path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_first_run</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">flag_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="c1"># download_to_subdir最后还有写入操作</span>
+            <span class="n">last_update</span> <span class="o">=</span> <span class="n">flag</span><span class="p">[</span><span class="s2">&quot;last_update&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_update</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">last_update</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CnblogsDownloader.download_to_subdir"><a class="viewcode-back" href="../cnblogs_downloader.html#cnblogs_downloader.CnblogsDownloader.download_to_subdir">[docs]</a>    <span class="k">def</span> <span class="nf">download_to_subdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        开始下载\n</span>
+<span class="sd">        主函数，多线程下载随笔及图片，线程数为随笔的分类数</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :return: 更新的随笔数量</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_workdir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;categoryId&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;未分类&quot;</span><span class="p">})</span>
+        <span class="n">download_threads</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">:</span>
+            <span class="c1"># (category,) 一个元素的元组 (category)是列表转元组</span>
+            <span class="n">download_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_category_download_thread</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">category</span><span class="p">,))</span>
+            <span class="n">download_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">download_threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">download_thread</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">download_thread</span> <span class="ow">in</span> <span class="n">download_threads</span><span class="p">:</span>
+            <span class="n">download_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;总共</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_essay</span><span class="si">}</span><span class="s2">篇随笔，更新了</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_updated_essay</span><span class="si">}</span><span class="s2">篇&quot;</span><span class="p">)</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_workdir</span><span class="si">}</span><span class="s2">\</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_FLAG_FILE_NAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">rf</span><span class="s1">&#39;</span><span class="se">{{</span><span class="s1">&quot;last_update&quot;: &quot;</span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">}}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updated_essay</span></div>
+
+<div class="viewcode-block" id="CnblogsDownloader._category_download_thread"><a class="viewcode-back" href="../cnblogs_downloader.html#cnblogs_downloader.CnblogsDownloader._category_download_thread">[docs]</a>    <span class="k">def</span> <span class="nf">_category_download_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        每个分类一个线程去下载随笔内容，需要的话，还能下载图片\n</span>
+<span class="sd">        多线程共用一个工作目录，任何一个线程os.chdir都会改变整个程序的工作目录</span>
+
+<span class="sd">        :param dict category: 分类的基本信息</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">category</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">rf</span><span class="s1">&#39;(</span><span class="se">\\</span><span class="s1">|/|\?|\||&quot;|:|\*|&lt;|&gt;)&#39;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="n">write_absolute_path</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_workdir</span><span class="si">}</span><span class="s2">\</span><span class="si">{</span><span class="n">dirname</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">essays</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_posts_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_http_headers</span><span class="p">,</span> <span class="n">category_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">category</span><span class="p">[</span><span class="s2">&quot;categoryId&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_essay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_essay</span> <span class="o">+</span> <span class="n">essays</span><span class="p">[</span><span class="s2">&quot;postsCount&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">essay_pre</span> <span class="ow">in</span> <span class="n">essays</span><span class="p">[</span><span class="s2">&quot;postList&quot;</span><span class="p">]:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">essay_pre</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
+            <span class="c1"># 替换特殊字符，Windows文件名不允许出现特殊字符： \/:*?&quot;&lt;&gt;|</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">rf</span><span class="s1">&#39;(</span><span class="se">\\</span><span class="s1">|/|\?|\||&quot;|:|\*|&lt;|&gt;)&#39;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="sa">rf</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}{</span><span class="s2">&quot;[非公开]&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">essay_pre</span><span class="p">[</span><span class="s2">&quot;isPublished&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="si">}</span><span class="s1">&#39;</span> \
+                       <span class="sa">rf</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;[草稿]&quot;</span> <span class="k">if</span> <span class="n">essay_pre</span><span class="p">[</span><span class="s2">&quot;isDraft&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="si">}</span><span class="s1">.md&#39;</span>
+
+            <span class="n">essay_date_updated</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">essay_pre</span><span class="p">[</span><span class="s2">&quot;dateUpdated&quot;</span><span class="p">],</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_first_run</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">write_absolute_path</span><span class="si">}</span><span class="s2">\</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_update</span> <span class="o">-</span> <span class="n">essay_date_updated</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;已是最新：</span><span class="si">{</span><span class="n">dirname</span><span class="si">}</span><span class="s2">\</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                <span class="k">continue</span>
+            <span class="n">essay</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_post_by_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_http_headers</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">essay_pre</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]))</span>
+
+            <span class="n">essay_content</span> <span class="o">=</span> <span class="n">essay</span><span class="p">[</span><span class="s2">&quot;blogPost&quot;</span><span class="p">][</span><span class="s2">&quot;postBody&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_img</span><span class="p">:</span>
+                <span class="n">essay_content</span> <span class="o">=</span> <span class="n">CnblogsDownloader</span><span class="o">.</span><span class="n">_download_replace_img</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">essay_content</span><span class="p">,</span> <span class="n">write_absolute_path</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">write_absolute_path</span><span class="si">}</span><span class="s2">\</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">essay_content</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updated_essay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updated_essay</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;已下载随笔：</span><span class="si">{</span><span class="n">dirname</span><span class="si">}</span><span class="s2">\</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CnblogsDownloader._download_replace_img"><a class="viewcode-back" href="../cnblogs_downloader.html#cnblogs_downloader.CnblogsDownloader._download_replace_img">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_download_replace_img</span><span class="p">(</span><span class="n">essay_title</span><span class="p">,</span> <span class="n">essay_content</span><span class="p">,</span> <span class="n">workdir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        替换文章内容中的图片，包括![]()和&lt;img src=&quot;xx&quot; style=&quot;height:450px&quot;&gt;的格式\n</span>
+<span class="sd">        img标签中其他属性也会被保留，比如替换后为&lt;img src=&quot;./img/xx&quot; style=&quot;height:450px&quot;&gt;\n</span>
+<span class="sd">        最后根据图片链接下载图片</span>
+
+<span class="sd">        :rtype: str</span>
+<span class="sd">        :return: 完成替换后的文章内容</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">img_url</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># bug：写成lambda表达式用or连接两句时，只会执行最后一个表达式，猜测是因为前面的语句没有返回值</span>
+        <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="n">img_url</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+            <span class="k">return</span> <span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">./img/</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="si">}{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span>
+                <span class="mi">3</span><span class="p">)</span> <span class="k">else</span> <span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">./img/</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="si">}{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">essay_content</span> <span class="o">=</span> <span class="n">CnblogsDownloader</span><span class="o">.</span><span class="n">_IMG_PATTERN</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">replace</span><span class="p">,</span> <span class="n">essay_content</span><span class="p">)</span>
+        <span class="n">http_headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Referer&quot;</span><span class="p">:</span> <span class="s2">&quot;https://i.cnblogs.com/&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">img_url</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">workdir</span><span class="si">}</span><span class="s2">\img&quot;</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">workdir</span><span class="si">}</span><span class="s2">\img&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">img_url</span><span class="p">:</span>
+            <span class="c1"># 不再校验文件名的合法性</span>
+            <span class="n">img_name</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">img_path</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">workdir</span><span class="si">}</span><span class="s2">/img/</span><span class="si">{</span><span class="n">img_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">img_path</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;图片已存在：</span><span class="si">{</span><span class="n">img_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">http_headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">api</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;已为《</span><span class="si">{</span><span class="n">essay_title</span><span class="si">}</span><span class="s2">》下载图片：</span><span class="si">{</span><span class="n">img_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;error: 为《</span><span class="si">{</span><span class="n">essay_title</span><span class="si">}</span><span class="s2">》下载图片失败，链接：</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">essay_content</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Charles.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.cnblogs_api &mdash; Cnblogs Blogger Downloader  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Cnblogs Blogger Downloader
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../main.html">main module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cnblogs_downloader.html">cnblogs_downloader module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lib/modules.html">lib</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cnblogs Blogger Downloader</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>lib.cnblogs_api</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.cnblogs_api</h1><div class="highlight"><pre>
+<span></span><span class="c1"># 文档注释采用sphinx的reStructuredText语法，可以使用sphinx构建api文档</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
+<span class="kn">import</span> <span class="nn">httpx</span>
+
+<span class="n">TIMEOUT</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="sd">&quot;&quot;&quot;HTTP连接超时时间&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="get_category_list"><a class="viewcode-back" href="../../lib/cnblogs_api.html#lib.cnblogs_api.get_category_list">[docs]</a><span class="k">def</span> <span class="nf">get_category_list</span><span class="p">(</span><span class="n">http_header</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    获取用户的博客分类</span>
+
+<span class="sd">    :param dict http_header: 其中应当包含Cookie</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc &lt;/lib/cnblogs-apiDoc.html&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://i.cnblogs.com/api/category/blog/1/edit&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">http_header</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_posts_list"><a class="viewcode-back" href="../../lib/cnblogs_api.html#lib.cnblogs_api.get_posts_list">[docs]</a><span class="k">def</span> <span class="nf">get_posts_list</span><span class="p">(</span><span class="n">http_header</span><span class="p">,</span> <span class="n">category_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    分页获取随笔列表，并把他们拼接成一页返回</span>
+
+<span class="sd">    :param dict http_header: 其中应当包含Cookie</span>
+<span class="sd">    :param int category_id: get_category_list结果中分类对应的id，不设置时查询所有随笔</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc &lt;/lib/cnblogs-apiDoc.html&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;https://i.cnblogs.com/api/posts/list?p=1&amp;cid=</span><span class="si">{</span><span class="n">category_id</span><span class="si">}</span><span class="s2">&amp;tid=&amp;t=1&amp;cfg=0&amp;search=&amp;orderBy=&amp;scid=&quot;</span><span class="p">,</span>
+                  <span class="n">headers</span><span class="o">=</span><span class="n">http_header</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="n">pmax</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;postsCount&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pmax</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">pmax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="sa">rf</span><span class="s2">&quot;https://i.cnblogs.com/api/posts/list?p=</span><span class="si">{</span><span class="n">page</span><span class="si">}</span><span class="s2">&amp;cid=</span><span class="si">{</span><span class="n">category_id</span><span class="si">}</span><span class="s2">&amp;tid=&amp;t=1&amp;cfg=0&amp;search=&amp;orderBy=&amp;scid=&quot;</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">http_header</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;postList&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;postList&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;postList&quot;</span><span class="p">]</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;pageSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;postList&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;pageSize&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;postsCount&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;合并分页出错&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="get_post_by_id"><a class="viewcode-back" href="../../lib/cnblogs_api.html#lib.cnblogs_api.get_post_by_id">[docs]</a><span class="k">def</span> <span class="nf">get_post_by_id</span><span class="p">(</span><span class="n">http_header</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    获取随笔详情</span>
+
+<span class="sd">    :param dict http_header: 其中应当包含Cookie</span>
+<span class="sd">    :param int id: 从`get_posts_list`结果中随笔对应的id</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    :return: 详情参见接口文档: `/lib/cnblogs-apiDoc &lt;/lib/cnblogs-apiDoc.html&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;https://i.cnblogs.com/api/posts/</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">http_header</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Charles.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

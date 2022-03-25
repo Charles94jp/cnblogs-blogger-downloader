@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cnblogs_downloader module &mdash; Cnblogs Blogger Downloader  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lib" href="lib/modules.html" />
+    <link rel="prev" title="main module" href="main.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Cnblogs Blogger Downloader
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">cnblogs_downloader module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lib/modules.html">lib</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cnblogs Blogger Downloader</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>cnblogs_downloader module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cnblogs_downloader.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cnblogs_downloader">
+<span id="cnblogs-downloader-module"></span><h1>cnblogs_downloader module<a class="headerlink" href="#module-cnblogs_downloader" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="cnblogs_downloader.CnblogsDownloader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cnblogs_downloader.</span></span><span class="sig-name descname"><span class="pre">CnblogsDownloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cnblogs_cookie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cnblogs_downloader.html#CnblogsDownloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cnblogs_downloader.CnblogsDownloader" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>下载器类，日志均print到控制台</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cnblogs_downloader.CnblogsDownloader._FLAG_FILE_NAME">
+<span class="sig-name descname"><span class="pre">_FLAG_FILE_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'.CnblogsDownloaderFlag.json'</span></em><a class="headerlink" href="#cnblogs_downloader.CnblogsDownloader._FLAG_FILE_NAME" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cnblogs_downloader.CnblogsDownloader._IMG_PATTERN">
+<span class="sig-name descname"><span class="pre">_IMG_PATTERN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('(!\\[[^\\]]*?\\]\\()([^\\)]*/([^\\)]*?))(\\))|(&lt;img[^&gt;]*?src=&quot;)([^&quot;]*/([^&quot;]*?))(&quot;[^&gt;]*?&gt;)')</span></em><a class="headerlink" href="#cnblogs_downloader.CnblogsDownloader._IMG_PATTERN" title="Permalink to this definition"></a></dt>
+<dd><p>预先编译正则
+called by <a class="reference internal" href="#cnblogs_downloader.CnblogsDownloader._download_replace_img" title="cnblogs_downloader.CnblogsDownloader._download_replace_img"><code class="xref py py-func docutils literal notranslate"><span class="pre">CnblogsDownloader._download_replace_img()</span></code></a></p>
+<p>此处正则中使用(?:)非捕获元无效</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cnblogs_downloader.CnblogsDownloader.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cnblogs_cookie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cnblogs_downloader.html#CnblogsDownloader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cnblogs_downloader.CnblogsDownloader.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>初始化下载器类</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cnblogs_cookie</strong> (<em>str</em>) – 博客园Cookie .Cnblogs.AspNetCore.Cookies的值</p></li>
+<li><p><strong>workdir</strong> (<em>str</em>) – 工作目录，即下载目录</p></li>
+<li><p><strong>download_img</strong> (<em>bool</em>) – 是否离线随笔中引用的图片</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cnblogs_downloader.CnblogsDownloader._category_download_thread">
+<span class="sig-name descname"><span class="pre">_category_download_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cnblogs_downloader.html#CnblogsDownloader._category_download_thread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cnblogs_downloader.CnblogsDownloader._category_download_thread" title="Permalink to this definition"></a></dt>
+<dd><p>每个分类一个线程去下载随笔内容，需要的话，还能下载图片</p>
+<p>多线程共用一个工作目录，任何一个线程os.chdir都会改变整个程序的工作目录</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>category</strong> (<em>dict</em>) – 分类的基本信息</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cnblogs_downloader.CnblogsDownloader._download_replace_img">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_download_replace_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">essay_title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">essay_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cnblogs_downloader.html#CnblogsDownloader._download_replace_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cnblogs_downloader.CnblogsDownloader._download_replace_img" title="Permalink to this definition"></a></dt>
+<dd><p>替换文章内容中的图片，包括![]()和&lt;img src=”xx” style=”height:450px”&gt;的格式</p>
+<p>img标签中其他属性也会被保留，比如替换后为&lt;img src=”./img/xx” style=”height:450px”&gt;</p>
+<p>最后根据图片链接下载图片</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>完成替换后的文章内容</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cnblogs_downloader.CnblogsDownloader.download_to_subdir">
+<span class="sig-name descname"><span class="pre">download_to_subdir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cnblogs_downloader.html#CnblogsDownloader.download_to_subdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cnblogs_downloader.CnblogsDownloader.download_to_subdir" title="Permalink to this definition"></a></dt>
+<dd><p>开始下载</p>
+<p>主函数，多线程下载随笔及图片，线程数为随笔的分类数</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>更新的随笔数量</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="main.html" class="btn btn-neutral float-left" title="main module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lib/modules.html" class="btn btn-neutral float-right" title="lib" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Charles.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
