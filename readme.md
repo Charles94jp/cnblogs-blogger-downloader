@@ -15,6 +15,18 @@
 博客园官方有[备份功能](https://www.cnblogs.com/super925/p/8093453.html)，但是下载的文件是一个xml，不易于阅读及分离文章
 
 
+# Table of Contents
+
+- [Usage](#usage)
+    - [Configuration](#configuration)
+    - [Dependencies](#dependencies)
+    - [Start](#start)
+    - [Features](#features)
+- [For Developer](#for-developer)
+    - [Document](#document)
+
+
+
 # Usage
 
 ## Configuration
@@ -89,7 +101,9 @@ python main.py
 
 
 
-本项目API文档：[Document](https://charles94jp.github.io/cnblogs-blogger-downloader)
+## Document
+
+本项目API文档：[**Document**](https://charles94jp.github.io/cnblogs-blogger-downloader)
 
 根据代码文档注释构建API文档：
 
@@ -98,7 +112,7 @@ pip install sphinx sphinx-rtd-theme
 sphinx-build.exe -b html .\sphinx\source\ docs
 ```
 
-注意`docs/lib/cnblogs-apiDoc.html`和`typora.css`是手动添加进去的
+注意`docs/lib/cnblogs-apiDoc.html` `typora.css`和ico是手动添加进去的
 
 
 
