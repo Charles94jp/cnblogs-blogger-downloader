@@ -101,6 +101,39 @@ python main.py
 
 
 
+**项目目录结构**
+
+```
+.
+
+├── docs                                   项目API文档，GitHub Pages
+├── img                                    readme文档图片	
+├── lib                      
+│    ├── cnblogs-apiDoc.md                     博客园接口文档
+│    └── cnblogs_api.py                        博客园http接口库
+├── sphinx                                 构建项目API文档
+│     ├── source
+│     │     ├── _static
+│     │     ├── _templates
+│     │     ├── lib
+│     │     ├── cnblogs_downloader.rst
+│     │     ├── conf.py                            sphinx配置文件
+│     │     ├── favicon.ico
+│     │     ├── index.rst
+│     │     └── main.rst
+│     ├── Makefile
+│     └── make.bat
+├── LICENSE                                项目开源许可证
+├── cnblogs_downloader.py                  程序主要逻辑实现
+├── config.ini.example                     配置文件示例
+├── main.py                                程序入口
+└── readme.md                              自述文件
+```
+
+
+
+
+
 ## Document
 
 本项目API文档：[**Document**](https://charles94jp.github.io/cnblogs-blogger-downloader)
