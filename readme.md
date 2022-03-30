@@ -10,9 +10,12 @@
 <a href="#python3"><img src="https://img.shields.io/badge/python-v3.8-blue"></a>
 <a href="https://www.python-httpx.org/"><img src="https://img.shields.io/badge/httpx-v0.22.0-brightgreen"></a>
 </p>
-本程序意在让博客园作者拿回属于自己的数据。程序会以博客园的随笔分类来建立文件夹并下载相应的随笔原稿件，文章格式为md格式，同时支持离线文章中引用的图片
+本程序代码开源，流程透明。旨在让博客园作者们安全快捷地拿回属于自己的数据
 
-博客园官方有[备份功能](https://www.cnblogs.com/super925/p/8093453.html)，但是下载的文件是一个xml，不易于阅读及分离文章
+程序会以博客园的随笔分类来建立文件夹并下载相应的随笔原稿件，文章格式为md格式，同时支持离线文章中引用的图片
+
+右上角点个star⭐不迷路~~~
+
 
 
 # Table of Contents
@@ -25,7 +28,7 @@
 - [For Developer](#for-developer)
     - [Document](#document)
 
-
+- [Links](#links)
 
 # Usage
 
@@ -33,17 +36,19 @@
 
 运行前需要配置`config.ini`：
 
-1. 修改`config.ini.example`文件名为`config.ini`
-2. 打开浏览器登录博客园，登录时勾选"记住我"
+1. 修改`config.ini.example`文件名为`config.ini`，使用文本编辑器打开
+2. 打开浏览器登录博客园后台，登录时勾选"记住我"
 3. 登录后浏览器按F12，找到Cookie，拷贝`.Cnblogs.AspNetCore.Cookies`的值到`config.ini`中
+<img src="./img/cookie.png" width ="660px">
 4. 其余选项按需填写，文件需以UTF-8编码保存
 
 开启离线后，随笔中的图片链接会被替换自动为本地图片的链接
 
 
 
-
 ## Dependencies
+
+运行`pip install`前需关闭系统全局代理
 
 ```
 pip install httpx
@@ -148,5 +153,16 @@ sphinx-build.exe -b html .\sphinx\source\ docs
 注意`docs/lib/cnblogs-apiDoc.html` `typora.css`和`docs/.nojekyll`是手动添加进去的
 
 
+
+## Links
+
+其他能帮助拿回博客园数据的方法：
+
+- 博客园官方[备份功能](https://www.cnblogs.com/super925/p/8093453.html)：缺点是下载的文件是一个xml，不易于阅读及分离文章
+- [InfoSpider](https://github.com/kangvcar/InfoSpider) ，缺点是它下载的是一个json文件，亦不能直接食用
+
+
+
+<br></br>
 
 本项目的开源协议为：[GPL-3.0 License](/LICENSE)
