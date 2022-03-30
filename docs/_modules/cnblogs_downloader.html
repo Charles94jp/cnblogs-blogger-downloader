@@ -6,6 +6,7 @@
   <title>cnblogs_downloader &mdash; Cnblogs Blogger Downloader  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -95,7 +96,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        初始化下载器类</span>
 
-<span class="sd">        :param str cnblogs_cookie: 博客园Cookie .Cnblogs.AspNetCore.Cookies的值</span>
+<span class="sd">        :param str cnblogs_cookie: 博客园Cookie ``.Cnblogs.AspNetCore.Cookies`` 的值</span>
 <span class="sd">        :param str workdir: 工作目录，即下载目录</span>
 <span class="sd">        :param bool download_img: 是否离线随笔中引用的图片</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -197,8 +198,8 @@
 <div class="viewcode-block" id="CnblogsDownloader._download_replace_img"><a class="viewcode-back" href="../cnblogs_downloader.html#cnblogs_downloader.CnblogsDownloader._download_replace_img">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_download_replace_img</span><span class="p">(</span><span class="n">essay_title</span><span class="p">,</span> <span class="n">essay_content</span><span class="p">,</span> <span class="n">workdir</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        替换文章内容中的图片，包括![]()和&lt;img src=&quot;xx&quot; style=&quot;height:450px&quot;&gt;的格式\n</span>
-<span class="sd">        img标签中其他属性也会被保留，比如替换后为&lt;img src=&quot;./img/xx&quot; style=&quot;height:450px&quot;&gt;\n</span>
+<span class="sd">        替换文章内容中的图片，包括 ``![]()`` 和 ``&lt;img src=&quot;xx&quot; style=&quot;height:450px&quot;&gt;`` 的格式\n</span>
+<span class="sd">        img标签中其他属性也会被保留，比如替换后为 ``&lt;img src=&quot;./img/xx&quot; style=&quot;height:450px&quot;&gt;`` \n</span>
 <span class="sd">        最后根据图片链接下载图片</span>
 
 <span class="sd">        :rtype: str</span>

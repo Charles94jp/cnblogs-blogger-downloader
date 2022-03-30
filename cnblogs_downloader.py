@@ -27,7 +27,7 @@ class CnblogsDownloader:
         """
         初始化下载器类
 
-        :param str cnblogs_cookie: 博客园Cookie .Cnblogs.AspNetCore.Cookies的值
+        :param str cnblogs_cookie: 博客园Cookie ``.Cnblogs.AspNetCore.Cookies`` 的值
         :param str workdir: 工作目录，即下载目录
         :param bool download_img: 是否离线随笔中引用的图片
         """
@@ -129,8 +129,8 @@ class CnblogsDownloader:
     @staticmethod
     def _download_replace_img(essay_title, essay_content, workdir):
         """
-        替换文章内容中的图片，包括![]()和<img src="xx" style="height:450px">的格式\n
-        img标签中其他属性也会被保留，比如替换后为<img src="./img/xx" style="height:450px">\n
+        替换文章内容中的图片，包括 ``![]()`` 和 ``<img src="xx" style="height:450px">`` 的格式\n
+        img标签中其他属性也会被保留，比如替换后为 ``<img src="./img/xx" style="height:450px">`` \n
         最后根据图片链接下载图片
 
         :rtype: str
