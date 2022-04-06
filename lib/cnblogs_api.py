@@ -12,7 +12,7 @@ def get_category_list(http_header):
     获取用户的博客分类
 
     :param dict http_header: 其中应当包含Cookie
-    :rtype: dict
+    :rtype: list
     :return: 详情参见接口文档: `cnblogs-apiDoc.md <./cnblogs-apiDoc.html>`_
     """
     r = httpx.get("https://i.cnblogs.com/api/category/blog/1/edit", headers=http_header, timeout=TIMEOUT)

@@ -33,7 +33,7 @@
 https://i.cnblogs.com/api/category/blog/1/edit
 ```
 
-**返回示例：**
+**成功返回示例：**
 
 ```json
 [
@@ -48,6 +48,19 @@ https://i.cnblogs.com/api/category/blog/1/edit
   }
 ]
 ```
+
+**未授权返回示例：**
+
+```json
+{
+    "errors": [
+        "Unauthorized"
+    ],
+    "type": 1
+}
+```
+
+
 
 <br></br>
 
