@@ -18,7 +18,7 @@
 
 
 
-# Table of Contents
+## Table of Contents
 
 - [Usage](#usage)
     - [Configuration](#configuration)
@@ -30,9 +30,9 @@
 
 - [Links](#links)
 
-# Usage
+## Usage
 
-## Configuration
+### Configuration
 
 运行前需要配置`config.ini`：
 
@@ -40,13 +40,14 @@
 2. 打开浏览器登录博客园后台，登录时勾选"记住我"
 3. 登录后浏览器按F12，找到Cookie，拷贝`.Cnblogs.AspNetCore.Cookies`的值到`config.ini`中
 <img src="./img/cookie.png" width ="660px">
+
 4. 其余选项按需填写，文件需以UTF-8编码保存
 
 开启离线后，随笔中的图片链接会被替换自动为本地图片的链接
 
 
 
-## Dependencies
+### Dependencies
 
 运行`pip install`前需关闭系统全局代理
 
@@ -56,7 +57,7 @@ pip install httpx
 
 
 
-## Start
+### Start
 
 配置好程序并安装好httpx依赖后，命令行运行：
 
@@ -72,7 +73,7 @@ python main.py
 
 
 
-## Features
+### Features
 
 下载的文件名为随笔标题，分类和标题中的特殊字符`\/:*?"<>|`会被空格代替，文件编码为UTF-8
 
@@ -98,7 +99,7 @@ python main.py
 
 
 
-# For Developer
+## For Developer
 
 博客园公开的api文档：https://api.cnblogs.com/help
 
@@ -139,7 +140,7 @@ python main.py
 
 
 
-## Document
+### Document
 
 本项目API文档：[**Document**](https://charles94jp.github.io/cnblogs-blogger-downloader)
 

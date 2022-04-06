@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import sys
 import threading
 from datetime import datetime
 
@@ -44,6 +45,10 @@ class CnblogsDownloader:
             "Referer": "https://i.cnblogs.com/",
             "Cookie": rf".Cnblogs.AspNetCore.Cookies={cnblogs_cookie}"}
         self._category = api.get_category_list(self._http_headers)
+        errors = self._category.get("errors1")
+        if errors is not None and errors[0] == "Unauthorized":
+            print("Cookie 已过期，请重新配置Cookie")
+            sys.exit()
 
         flag_path = rf"{workdir}\{self._FLAG_FILE_NAME}"
         if os.path.isfile(flag_path):
