@@ -46,7 +46,7 @@ class CnblogsDownloader:
             "Cookie": rf".Cnblogs.AspNetCore.Cookies={cnblogs_cookie}"}
         self._category = api.get_category_list(self._http_headers)
         if type(self._category) == dict:
-            errors = self._category.get("errors1")
+            errors = self._category.get("errors")
             if errors is not None and errors[0] == "Unauthorized":
                 print("Cookie 已过期，请重新配置Cookie")
                 sys.exit()
