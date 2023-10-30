@@ -2,7 +2,6 @@
   <a href="#">
   <img src="./img/logo.png" width ="530px">
   </a>
-  <br>
 </h1>
 
 <p align="center">
@@ -10,9 +9,21 @@
 <a href="#python3"><img src="https://img.shields.io/badge/python-v3.8-blue"></a>
 <a href="https://www.python-httpx.org/"><img src="https://img.shields.io/badge/httpx-v0.22.0-brightgreen"></a>
 </p>
-本程序代码开源，流程透明。旨在让博客园作者们安全快捷地拿回属于自己的数据
 
-程序会以博客园的随笔分类来建立文件夹并下载相应的随笔原稿件，文章格式为md格式，同时支持离线文章中引用的图片
+
+博客园专注于为开发者服务，致力于为开发者打造一个**纯净的**技术学习与交流社区
+
+如果你也受到过其它博客平台的骚扰：碍眼的广告，搜索引擎中点进靠前的搜索结果却无功而返
+
+想要维护一片纯净之地的话，欢迎支持博客园，她需要你：
+
+👉 **[会员救园](https://www.cnblogs.com/cmt/p/17520031.html)**
+
+---
+
+本程序代码开源，流程透明。旨在帮助博主们把自己的博客离线到本地
+
+程序会以博客园的随笔分类来建立文件夹并下载相应的随笔原稿件，文章格式为 markdown (.md) 格式，同时支持离线文章中引用的图片
 
 右上角点个star⭐不迷路~~~
 
