@@ -5,5 +5,5 @@ work_directory = D:\cnblogs
 # 博客园网页名为.Cnblogs.AspNetCore.Cookies的Cookie的值
 .Cnblogs.AspNetCore.Cookies = UP1SouGdXl
 
-# 是否离线随笔中的图片，是请填True。开启离线后，随笔中的图片链接会被自动替换为本地图片的链接
-download_images = False
+# 是否离线随笔中的图片，是请填True。开启离线后，会下载图片，随笔中的图片链接会被替换为本地图片的相对地址
+download_images = True

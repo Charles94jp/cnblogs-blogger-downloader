@@ -51,7 +51,16 @@ class CnblogsDownloader:
                 print("Cookie 已过期，请重新配置Cookie")
                 sys.exit()
 
-        flag_path = rf"{workdir}\{self._FLAG_FILE_NAME}"
+        flag_path = rf"{workdir}{os.sep}{self._FLAG_FILE_NAME}"
+
+        # 检查工作目录
+        if not os.path.exists(workdir):
+            os.makedirs(workdir)
+        else:
+            if os.listdir(workdir) and not os.path.isfile(flag_path):
+                print("文件夹不为空，非CnblogsDownloader工作目录，详情查看-h")
+                sys.exit()
+
         if os.path.isfile(flag_path):
             self._is_first_run = False
             flag = None
@@ -83,7 +92,7 @@ class CnblogsDownloader:
             download_thread.join()
         print(rf"总共{self._total_essay}篇随笔，更新了{self._updated_essay}篇")
         now = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        with open(rf"{self._workdir}\{self._FLAG_FILE_NAME}", "w", encoding="utf-8") as f:
+        with open(rf"{self._workdir}{os.sep}{self._FLAG_FILE_NAME}", "w", encoding="utf-8") as f:
             f.write(rf'{{"last_update": "{now}"}}')
         os.chdir(current_path)
         return self._updated_essay
@@ -99,7 +108,7 @@ class CnblogsDownloader:
         dirname = re.sub(rf'(\\|/|\?|\||"|:|\*|<|>)', " ", dirname)
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
-        write_absolute_path = rf"{self._workdir}\{dirname}"
+        write_absolute_path = rf"{self._workdir}{os.sep}{dirname}"
 
         essays = api.get_posts_list(self._http_headers, category_id=str(category["categoryId"]))
         self._lock.acquire()
@@ -113,10 +122,10 @@ class CnblogsDownloader:
                        rf'{"[草稿]" if essay_pre["isDraft"] else ""}.md'
 
             essay_date_updated = datetime.strptime(essay_pre["dateUpdated"], "%Y-%m-%dT%H:%M:%S")
-            if (not self._is_first_run) and os.path.isfile(rf"{write_absolute_path}\{filename}") and \
+            if (not self._is_first_run) and os.path.isfile(rf"{write_absolute_path}{os.sep}{filename}") and \
                     (self._last_update - essay_date_updated).total_seconds() > 0:
                 self._lock.acquire()
-                print(rf"已是最新：{dirname}\{filename}")
+                print(rf"已是最新：{dirname}{os.sep}{filename}")
                 self._lock.release()
                 continue
             essay = api.get_post_by_id(self._http_headers, str(essay_pre["id"]))
@@ -125,11 +134,11 @@ class CnblogsDownloader:
             if self._download_img:
                 essay_content = CnblogsDownloader._download_replace_img(filename, essay_content, write_absolute_path)
 
-            with open(rf"{write_absolute_path}\{filename}", "w", encoding="utf-8") as f:
+            with open(rf"{write_absolute_path}{os.sep}{filename}", "w", encoding="utf-8") as f:
                 f.write(essay_content)
             self._lock.acquire()
             self._updated_essay = self._updated_essay + 1
-            print(rf"已下载随笔：{dirname}\{filename}")
+            print(rf"已下载随笔：{dirname}{os.sep}{filename}")
             self._lock.release()
 
     @staticmethod
